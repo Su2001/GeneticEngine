@@ -23,23 +23,6 @@ blacks = [(0, 6),
 top_target = [3,2,4,10,4,3,9]
 side_target = [5,5,6,5,4,4,6]
 
-vertical_x = []
-vertical_y = []
-
-for i in range(6):
-    for j in range(7):
-        if not ((i,j) in blacks or (i+1,j) in blacks):
-            vertical_x.append(j)
-            vertical_y.append(i)
-
-horizontal_x = []
-horizontal_y = []
-for i in range(7):
-    for j in range(1,7):
-        if not ((i,j) in blacks or (i,j-1) in blacks):
-            horizontal_x.append(j)
-            horizontal_y.append(i)
-
 def generateMatrix(x):
     result = []
     for _ in range(0,x):
@@ -52,7 +35,6 @@ def generateMatrix(x):
 class Domino(ABC):
     pass
 
-
 class Board(ABC):
     pass
 
@@ -62,25 +44,6 @@ class Cal(ABC):
 class Value(ABC):
     pass
 
-
-
-@dataclass
-class Dots(Value):
-    value: Annotated[int, IntRange(0,2)]
-    def __str__(self):
-        return str(self.value)
-
-@dataclass
-class Row(Cal):
-    line : Annotated[List[Dots], ListSizeBetween(7, 7)]
-    def __str__(self):
-        return str(self.line)
-    
-@dataclass
-class Column(Cal):
-    col : Annotated[List[Row], ListSizeBetween(7, 7)]
-    def __str__(self):
-        return str(self.col)
 
 #------------------------------------------------------------
 @dataclass
@@ -210,28 +173,6 @@ def fitness_function(n:Board):
                 r-= p_not_visited
     return r
 
-def fitness_function_v2(n:Column):
-    temp_top = [0.0]*7
-    temp_side=[0.0]*7
-    for i in range(7):
-        for j in range(7):
-            temp_side[i]+= n.col[i].line[j].value
-            temp_top[j]+= n.col[i].line[j].value
-    r=0
-    count = 1
-    for i in range(7):
-        top =abs(temp_top[i] - top_target[i]) 
-        if top :
-            r-=2*top
-        else:
-            r+=1
-        side = abs(temp_side[i] - side_target[i])
-        if side:
-            r-=2*side
-        else:
-            r+=1
-    return r
-
 def fitness_function_v3(n:Board):
     r = 0.0
     temp_top_target = [0] * 7
@@ -318,14 +259,6 @@ def toboard(board):
         result += "\n"
     return result
 
-def toboardv2(board:Column):
-    result='\n'
-    for i in board.col:
-        for j in i.line:
-            result += str(j)+" "
-        result += "\n"
-    return result
-
 def toboardv3(board):
     visited = generateMatrix(7)
     for i in blacks:
@@ -370,32 +303,6 @@ class DominoMatchBenchmark:
         best = alg.search()
         print(
             f"Fitness of {best.get_fitness(alg.get_problem())} by genotype: {toboard(best.genotype)} with phenotype: {toboard(best.get_phenotype())}",
-        )
-
-class DominoMatchBenchmarkV2:
-
-    def get_grammar(self) -> Grammar:
-        return extract_grammar([Column, Row, Dots], Column)
-
-    def main(self, **args):
-        g = self.get_grammar()
-
-        alg = SimpleGP(
-            grammar=g,
-            minimize=False,
-            fitness_function=fitness_function_v2,
-            crossover_probability=0.75,
-            mutation_probability=0.01,
-            max_depth=15,
-            max_evaluations=20000,
-            population_size=500,
-            selection_method=("tournament", 2),
-            elitism=5,
-            **args,
-        )
-        best = alg.search()
-        print(
-            f"Fitness of {best.get_fitness(alg.get_problem())} by genotype: {toboardv2(best.genotype)} with phenotype: {toboardv2(best.get_phenotype())}",
         )
 
 class DominoMatchBenchmarkV3:
