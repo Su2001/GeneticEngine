@@ -22,7 +22,8 @@ class LLMsInitializer(PopulationInitializer):
         target_size: int,
         **kwargs,
     ) -> Iterator[PhenotypicIndividual]:
-        for i in create(representation.__getattribute__("grammar").__getattribute__("starting_symbol"), target_size):
+        for i in create(representation.__getattribute__("grammar").__getattribute__("starting_symbol"),
+                        representation.__getattribute__("grammar").__getattribute__("considered_subtypes"), target_size):
             yield PhenotypicIndividual(
                 i,
                 representation=representation,
