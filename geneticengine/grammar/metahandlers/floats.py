@@ -34,6 +34,7 @@ class FloatRange(MetaHandlerGenerator):
         base_type: type,
         rec: Callable[[type[T]], T],
         dependent_values: dict[str, Any],
+        parent_values: list[dict[str, Any]],
     ):
         return random.random_float(self.min, self.max)
 
@@ -50,6 +51,8 @@ class FloatRange(MetaHandlerGenerator):
         self,
         base_type: type,
         combine_lists: Callable[[list[type]], Generator[Any, Any, Any]],
+        rec: Any,
+        dependent_values: dict[str, Any],
     ):
         v = self.min
         while v <= self.max:
