@@ -274,7 +274,7 @@ def create_node(
                 global_context,
                 starting_symbol=typ,
                 dependent_values=dependent_values,
-                parent_values=parent_values,
+                parent_values=parent_values ,
                 context=LocalSynthesisContext(context.depth, context.nodes, context.expansions + 1, dependent_vals, parent_vals),
                 **kwargs,
             )
@@ -333,6 +333,7 @@ def create_node(
                         inner_type = get_generic_parameter(list_type)
                         arg = GengyList(inner_type, arg)  # type: ignore
                 else:
+                    dependent_values[argn] = None
                     arg = create_node(
                         global_context,
                         argt,
